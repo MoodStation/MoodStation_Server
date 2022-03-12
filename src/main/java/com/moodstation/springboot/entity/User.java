@@ -1,4 +1,4 @@
-package com.moodstation.springboot.domain.user;
+package com.moodstation.springboot.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
