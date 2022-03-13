@@ -1,9 +1,12 @@
 package com.moodstation.springboot.entity;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
@@ -23,6 +26,20 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
-    private String accesstoken;
+    @Column(name = "created_at")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDateTime updatedAt;
+
+    @Builder
+    public User(String email, String nickname, String password) {
+        this.email = email;
+        this.nickname = nickname;
+        this.password = password;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
 }
