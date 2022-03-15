@@ -20,7 +20,7 @@ import java.util.List;
 public class UserPostDto {
     private Long id;
 
-    private Long user;
+    private User user;
 
     @JsonFormat(shape=JsonFormat.Shape.STRING,pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -31,4 +31,5 @@ public class UserPostDto {
     private PostImg postImg;
 
     private List<String> keywords;
+
 }
