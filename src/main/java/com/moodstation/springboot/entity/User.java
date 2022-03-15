@@ -34,6 +34,9 @@ public class User {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime updatedAt;
 
+    @Column(nullable = false)
+    private String accessToken;
+
     @Builder
     public User(String email, String nickname, String password) {
         this.email = email;
