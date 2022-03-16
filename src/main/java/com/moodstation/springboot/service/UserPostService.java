@@ -69,4 +69,8 @@ public class UserPostService {
 
         return userPostRepository.findByUser(findUser);
     }
+
+    public UserPost getUserPostDetail(Long pid){
+        return userPostRepository.findById(pid).get();
+    }
 }
