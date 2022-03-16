@@ -17,12 +17,10 @@ public class UserPost {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /*
-        User 추가되면 수정
-        Build, UserPostDto 추가로 수정해주기
-     */
-    //@ManyToOne(fetch = FetchType.LAZY)
-    private Long user;
+
+    //@ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    private User user;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate regDate;
@@ -34,7 +32,7 @@ public class UserPost {
 
 
     @Builder
-    public UserPost(Long id, Long user, LocalDate regDate, String color, PostImg postImg) {
+    public UserPost(Long id, User user, LocalDate regDate, String color, PostImg postImg) {
         this.id = id;
         this.user = user;
         this.regDate = regDate;

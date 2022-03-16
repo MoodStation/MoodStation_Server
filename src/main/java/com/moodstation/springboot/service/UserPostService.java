@@ -58,15 +58,15 @@ public class UserPostService {
     }
 
 
-//    public List<Keyword> getKeywords(Long uid){
-//        User findUser = userRepository.findById(uid).get();
-//
-//        return keywordRepository.findByUser(findUser);
-//    }
-//
-//    public List<UserPost> getUserPosts(Long uid){
-//        User findUser = userRepository.findById(uid).get();
-//
-//        return userPostRepository.findByUser(findUser);
-//    }
+    public List<Keyword> getKeywords(Long uid){
+        User findUser = userRepository.findById(uid).get();
+
+        return keywordRepository.findByUser(findUser);
+    }
+
+    public List<UserPost> getUserPosts(Long uid){
+        User findUser = userRepository.findById(uid).get();
+
+        return userPostRepository.findByUser(findUser);
+    }
 }
