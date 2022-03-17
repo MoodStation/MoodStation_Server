@@ -21,10 +21,10 @@ public class Keyword {
     private String isShare;
 
     //@ManyToOne(fetch = FetchType.LAZY)
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     private UserPost userPost;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     @Builder
