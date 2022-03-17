@@ -18,6 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserPostService {
     private final UserPostRepository userPostRepository;
     private final KeywordRepository keywordRepository;
@@ -72,5 +73,13 @@ public class UserPostService {
 
     public UserPost getUserPostDetail(Long pid){
         return userPostRepository.findById(pid).get();
+    }
+
+    public void removeUserPost(Long pid){
+        UserPost userPost= userPostRepository.findById(pid).get();
+        keywordRepository.deleteByUserPost(userPost);
+        String filePath = userPost.getPostImg().getFilePath();
+        s3Service.delete(filePath);
+        userPostRepository.findById(pid);
     }
 }

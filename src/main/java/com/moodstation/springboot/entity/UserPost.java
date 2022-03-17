@@ -19,7 +19,7 @@ public class UserPost {
 
 
     //@ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     private User user;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")

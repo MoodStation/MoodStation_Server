@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -65,5 +66,9 @@ public class S3Service {
                 .withCannedAcl(CannedAccessControlList.PublicRead));
 
         return fileName;
+    }
+
+    public void delete(String filePath){
+        s3Client.deleteObject(bucket,filePath);
     }
 }
