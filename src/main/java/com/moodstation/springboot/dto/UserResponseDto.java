@@ -5,14 +5,16 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class UserCreateResponseDto {
+public class UserResponseDto {
 
-    private HttpStatus statusCode;
+    private int status;
+    private String message;
     private String email;
     private String nickname;
 
-    public UserCreateResponseDto(HttpStatus statusCode, UserCreateRequestDto entity) {
-        this.statusCode = statusCode;
+    public UserResponseDto(HttpStatus statusCode, User entity) {
+        this.status = statusCode.value();
+        this.message = "회원가입 성공";
         this.email = entity.getEmail();
         this.nickname = entity.getNickname();
     }
