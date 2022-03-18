@@ -4,12 +4,10 @@ import com.moodstation.springboot.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Getter
 @NoArgsConstructor
 public class UserCreateRequestDto {
-    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     private String email;
     private String nickname;
@@ -19,7 +17,7 @@ public class UserCreateRequestDto {
     public UserCreateRequestDto(String email, String nickname, String password) {
         this.email = email;
         this.nickname = nickname;
-        this.password = encoder.encode(password);
+        this.password = password;
     }
 
     public User toEntity() {

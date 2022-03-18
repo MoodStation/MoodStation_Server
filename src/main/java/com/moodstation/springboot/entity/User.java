@@ -3,14 +3,17 @@ package com.moodstation.springboot.entity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @Entity
+@Table(name = "user")
 public class User {
 
     @Id
@@ -33,9 +36,6 @@ public class User {
     @Column(name = "updated_at")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime updatedAt;
-
-    @Column(nullable = false)
-    private String accessToken;
 
     @Builder
     public User(String email, String nickname, String password) {
