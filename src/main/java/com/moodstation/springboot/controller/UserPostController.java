@@ -68,8 +68,13 @@ public class UserPostController {
     }
 
     @DeleteMapping("/{pid}")
-    public ResponseEntity removePostDetail(@PathVariable Long pid){
+    public ResponseEntity removePostDetail(
+            @RequestHeader String accessToken,
+            @PathVariable Long pid){
+        if(accessToken==null) return new ResponseEntity(HttpStatus.FORBIDDEN);
+
         userPostService.removeUserPost(pid);
+
         return new ResponseEntity(HttpStatus.OK);
     }
 

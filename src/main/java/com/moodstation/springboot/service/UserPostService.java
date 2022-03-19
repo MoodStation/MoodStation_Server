@@ -101,8 +101,8 @@ public class UserPostService {
     public void removeUserPost(Long pid){
         UserPost userPost= userPostRepository.findById(pid).get();
         keywordRepository.deleteByUserPost(userPost);
-        String filePath = userPost.getPostImg().getFilePath();
-        s3Service.delete(filePath);
+        s3Service.delete(userPost.getPostImg().getFilePath());
+        userPostRepository.deleteById(pid);
     }
 
     public void updateUserPostWithPhoto(UserPostDto userPostDto, PostImgDto postImgDto, Long pid){
