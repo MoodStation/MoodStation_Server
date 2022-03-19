@@ -17,7 +17,6 @@ public class UserPost {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     //@ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
     @ManyToOne(cascade = CascadeType.REMOVE)
     private User user;
