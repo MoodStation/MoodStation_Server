@@ -46,14 +46,14 @@ public class UserPostController {
         return new ResponseEntity<>(postNo, HttpStatus.OK);
     }
 
-//    @GetMapping()
-//    public ResponseEntity<Map<String,Object>> getPostList(){
-//        List<UserPost> userPosts = userPostService.getUserPosts(1L);
-//        List<Keyword> keywords = userPostService.getKeywords(1L);
-//        Map<String, Object> result = new HashMap<>();
-//        result.put("userPosts", userPosts);
-//        result.put("keywords", keywords);
-//
-//        return new ResponseEntity(result, HttpStatus.OK);
-//    }
+    @GetMapping()
+    public ResponseEntity<Map<String,Object>> getPostList(){
+        List<Keyword> keywords = userPostService.getKeywords(userId);
+        List<UserPost> userPosts = userPostService.getUserPosts(userId);
+        Map<String, Object> result = new HashMap<>();
+        result.put("keywords", keywords);
+        result.put("userPosts", userPosts);
+
+        return new ResponseEntity(result, HttpStatus.OK);
+    }
 }

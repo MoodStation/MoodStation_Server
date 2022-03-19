@@ -23,8 +23,11 @@ public class UserPostService {
     private final KeywordRepository keywordRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final S3Service s3Service;
 
     public Long addPostWithPhoto(Long userId,UserPostDto userPostDto, PostImgDto postImgDto) {
+        postImgDto.setFileFullPath("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/" + postImgDto.getFilePath());
+
         userPostDto.setPostImg(modelMapper.map(postImgDto,PostImg.class));
         User findUser = userRepository.findById(userId).get();
         userPostDto.setUser(findUser);
@@ -56,14 +59,15 @@ public class UserPostService {
     }
 
 
-//    public List<Keyword> getKeywords(Long uid){
-//        User user = userRepository.findById(uid).get();
-//
-//        return keywordRepository.findByUser(user);
-//    }
-//
-//    public List<UserPost> getUserPosts(Long uid){
-//        User user = userRepository.findById(uid).get();
-//        return userPostRepository.findByUser(user);
-//    }
+    public List<Keyword> getKeywords(Long uid){
+        User findUser = userRepository.findById(uid).get();
+
+        return keywordRepository.findByUser(findUser);
+    }
+
+    public List<UserPost> getUserPosts(Long uid){
+        User findUser = userRepository.findById(uid).get();
+
+        return userPostRepository.findByUser(findUser);
+    }
 }

@@ -1,10 +1,8 @@
 package com.moodstation.springboot.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.moodstation.springboot.entity.Keyword;
 import com.moodstation.springboot.entity.PostImg;
 import com.moodstation.springboot.entity.User;
-import com.moodstation.springboot.entity.UserPost;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

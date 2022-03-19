@@ -2,11 +2,13 @@ package com.moodstation.springboot.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Keyword {
@@ -18,7 +20,8 @@ public class Keyword {
 
     private String isShare;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    //@ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private UserPost userPost;
 
     @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.REMOVE)
