@@ -28,6 +28,7 @@ public class UserPostService {
 
     public Long addPostWithPhoto(Long userId,UserPostDto userPostDto, PostImgDto postImgDto) {
         postImgDto.setFileFullPath("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/" + postImgDto.getFilePath());
+
         userPostDto.setPostImg(modelMapper.map(postImgDto,PostImg.class));
         User findUser = userRepository.findById(userId).get();
         userPostDto.setUser(findUser);

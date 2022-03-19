@@ -56,7 +56,7 @@ public class UserPostController {
 
         return new ResponseEntity(result, HttpStatus.OK);
     }
-
+  
     @GetMapping("/{pid}")
     public ResponseEntity getPostDetail(@PathVariable Long pid){
         UserPost findPost = userPostService.getUserPostDetail(pid);
