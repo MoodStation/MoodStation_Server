@@ -56,4 +56,17 @@ public class UserPostController {
 
         return new ResponseEntity(result, HttpStatus.OK);
     }
+  
+    @GetMapping("/{pid}")
+    public ResponseEntity getPostDetail(@PathVariable Long pid){
+        UserPost findPost = userPostService.getUserPostDetail(pid);
+
+        return new ResponseEntity(findPost, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{pid}")
+    public ResponseEntity removePostDetail(@PathVariable Long pid){
+        userPostService.removeUserPost(pid);
+        return new ResponseEntity(HttpStatus.OK);
+    }
 }

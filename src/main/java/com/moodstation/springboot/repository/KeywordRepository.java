@@ -11,4 +11,7 @@ public interface KeywordRepository extends JpaRepository<Keyword, Long> {
     List<Keyword> findByUserPost(UserPost userPost);
 
     List<Keyword> findByUser(User user);
+
+    void deleteByUserPost(UserPost userPost);
+
 }
