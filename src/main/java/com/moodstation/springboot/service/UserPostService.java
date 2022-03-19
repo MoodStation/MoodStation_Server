@@ -2,6 +2,7 @@ package com.moodstation.springboot.service;
 
 import com.moodstation.springboot.dto.PostImgDto;
 import com.moodstation.springboot.dto.UserPostDto;
+import com.moodstation.springboot.dto.UserPostListResponseDto;
 import com.moodstation.springboot.dto.UserPostResponseDto;
 import com.moodstation.springboot.entity.Keyword;
 import com.moodstation.springboot.entity.PostImg;
@@ -18,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -79,10 +79,22 @@ public class UserPostService {
         return result;
     }
 
-    public List<UserPost> getUserPosts(Long uid){
-        User findUser = userRepository.findById(uid).get();
+    public List<UserPostListResponseDto> getUserPosts(String accessToken){
+        List<UserPost> posts
+                = userPostRepository.findByUser(userRepository.findByAccessToken(accessToken));
 
-        return userPostRepository.findByUser(findUser);
+        List<UserPostListResponseDto> result = new ArrayList<>();
+        for (UserPost post : posts) {
+            UserPostListResponseDto userPost = UserPostListResponseDto.builder()
+                    .postId(post.getId())
+                    .postImg(post.getPostImg())
+                    .regDate(post.getRegDate())
+                    .content(post.getContent())
+                    .keywords(getKeywords(post.getId()))
+                    .build();
+            result.add(userPost);
+        }
+        return result;
     }
 
     public UserPostResponseDto getUserPostDetail(Long pid){

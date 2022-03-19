@@ -2,9 +2,8 @@ package com.moodstation.springboot.controller;
 
 import com.moodstation.springboot.dto.PostImgDto;
 import com.moodstation.springboot.dto.UserPostDto;
+import com.moodstation.springboot.dto.UserPostListResponseDto;
 import com.moodstation.springboot.dto.UserPostResponseDto;
-import com.moodstation.springboot.entity.Keyword;
-import com.moodstation.springboot.entity.UserPost;
 import com.moodstation.springboot.service.PostImgService;
 import com.moodstation.springboot.service.S3Service;
 import com.moodstation.springboot.service.UserPostService;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,8 +48,12 @@ public class UserPostController {
     }
 
     @GetMapping()
-    public ResponseEntity<Map<String,Object>> getPostList(){
-        List<UserPost> postList = userPostService.getUserPosts(userId);
+    public ResponseEntity<Map<String,Object>> getPostList(
+            @RequestHeader String accessToken
+    ){
+        if(accessToken==null) return new ResponseEntity(HttpStatus.FORBIDDEN);
+
+        List<UserPostListResponseDto> postList = userPostService.getUserPosts(accessToken);
 
         return new ResponseEntity(postList, HttpStatus.OK);
     }
