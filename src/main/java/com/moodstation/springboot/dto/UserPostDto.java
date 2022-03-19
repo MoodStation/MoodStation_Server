@@ -28,6 +28,8 @@ public class UserPostDto {
 
     private PostImg postImg;
 
+    private String content;
+
     private List<String> keywords;
 
 }

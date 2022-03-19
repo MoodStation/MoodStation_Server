@@ -21,7 +21,7 @@ public class Keyword {
     private String isShare;
 
     //@ManyToOne(fetch = FetchType.LAZY)
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     private UserPost userPost;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,6 +33,9 @@ public class Keyword {
         this.isShare = isShare;
         this.userPost = userPost;
         this.user = user;
+    }
 
+    public void updateKeyword(String content) {
+        this.content = content;
     }
 }

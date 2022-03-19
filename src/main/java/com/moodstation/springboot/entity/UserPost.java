@@ -27,16 +27,27 @@ public class UserPost {
 
     private String color;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    private String content;
+
+    @OneToOne(cascade = CascadeType.PERSIST,orphanRemoval = true)
     private PostImg postImg;
 
-
     @Builder
-    public UserPost(Long id, User user, LocalDate regDate, String color, PostImg postImg) {
+    public UserPost(Long id, User user, LocalDate regDate,String content, String color, PostImg postImg) {
         this.id = id;
         this.user = user;
         this.regDate = regDate;
         this.color = color;
         this.postImg = postImg;
+        this.content = content;
     }
+
+    public void changeUserPost(LocalDate regDate, String color, String content, PostImg postImg) {
+        this.regDate = regDate;
+        this.color = color;
+        this.content = content;
+        this.postImg = postImg;
+    }
+
+
 }

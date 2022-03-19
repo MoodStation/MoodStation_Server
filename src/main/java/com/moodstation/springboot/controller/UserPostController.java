@@ -4,6 +4,7 @@ import com.moodstation.springboot.dto.PostImgDto;
 import com.moodstation.springboot.dto.UserPostDto;
 import com.moodstation.springboot.entity.Keyword;
 import com.moodstation.springboot.entity.UserPost;
+import com.moodstation.springboot.service.PostImgService;
 import com.moodstation.springboot.service.S3Service;
 import com.moodstation.springboot.service.UserPostService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserPostController {
     private final UserPostService userPostService;
+    private final PostImgService postImgService;
     private final S3Service s3Service;
     private static final Long userId=1L;
 
@@ -68,5 +70,25 @@ public class UserPostController {
     public ResponseEntity removePostDetail(@PathVariable Long pid){
         userPostService.removeUserPost(pid);
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @PutMapping("/{pid}")
+    public ResponseEntity updatePostDetail(@PathVariable Long pid,
+                                           MultipartFile file,
+                                           PostImgDto postImgDto,
+                                           @ModelAttribute UserPostDto userPostDto) throws IOException {
+
+        if (file != null) {
+            postImgDto.setImgName(file.getName());
+            postImgDto.setFilePath(s3Service.upload(postImgDto.getFilePath(), file));
+            postImgService.updatePostImg(pid, postImgDto);
+            userPostService.updateUserPostWithPhoto(userPostDto, postImgDto, pid);
+        } else {
+            //postImgService.deletePostImg(pid);
+            userPostService.updateUserPost(userPostDto, pid);
+        }
+
+        return new ResponseEntity(HttpStatus.OK);
+
     }
 }

@@ -7,6 +7,7 @@ import com.moodstation.springboot.entity.PostImg;
 import com.moodstation.springboot.entity.User;
 import com.moodstation.springboot.entity.UserPost;
 import com.moodstation.springboot.repository.KeywordRepository;
+import com.moodstation.springboot.repository.PostImgRepository;
 import com.moodstation.springboot.repository.UserPostRepository;
 import com.moodstation.springboot.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,13 +24,16 @@ public class UserPostService {
     private final UserPostRepository userPostRepository;
     private final KeywordRepository keywordRepository;
     private final UserRepository userRepository;
+    private final PostImgRepository postImgRepository;
     private final ModelMapper modelMapper;
     private final S3Service s3Service;
+    private final PostImgService postImgService;
 
     public Long addPostWithPhoto(Long userId,UserPostDto userPostDto, PostImgDto postImgDto) {
         postImgDto.setFileFullPath("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/" + postImgDto.getFilePath());
 
         userPostDto.setPostImg(modelMapper.map(postImgDto,PostImg.class));
+
         User findUser = userRepository.findById(userId).get();
         userPostDto.setUser(findUser);
         Long savedPostId = userPostRepository.save(modelMapper.map(userPostDto, UserPost.class)).getId();
@@ -81,6 +85,46 @@ public class UserPostService {
         keywordRepository.deleteByUserPost(userPost);
         String filePath = userPost.getPostImg().getFilePath();
         s3Service.delete(filePath);
-        userPostRepository.findById(pid);
     }
+
+    public void updateUserPostWithPhoto(UserPostDto userPostDto, PostImgDto postImgDto, Long pid){
+        postImgDto.setFileFullPath("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/" + postImgDto.getFilePath());
+        userPostDto.setPostImg(modelMapper.map(postImgDto,PostImg.class));
+        UserPost findUserPost = userPostRepository.findById(pid).get();
+
+//        userPostDto.setPostImg(modelMapper.map(postImgDto,PostImg.class));
+
+        //기존 키워드 삭제
+        keywordRepository.deleteByUserPost(findUserPost);
+        addKeywords(pid,userPostDto.getUser().getId(),userPostDto.getKeywords());
+
+        findUserPost.changeUserPost(
+                userPostDto.getRegDate(),
+                userPostDto.getColor(),
+                userPostDto.getContent(),
+                userPostDto.getPostImg()
+        );
+    }
+
+
+    public void updateUserPost(UserPostDto userPostDto, Long pid) {
+        UserPost findUserPost = userPostRepository.findById(pid).get();
+
+        if (findUserPost.getPostImg().getId()!=null) {
+            postImgService.deletePostImg(pid);
+            s3Service.delete(findUserPost.getPostImg().getFilePath());
+        }
+
+        //기존 키워드 삭제
+        keywordRepository.deleteByUserPost(findUserPost);
+        addKeywords(pid,userPostDto.getUser().getId(),userPostDto.getKeywords());
+
+        findUserPost.changeUserPost(
+                userPostDto.getRegDate(),
+                userPostDto.getColor(),
+                userPostDto.getContent(),
+                userPostDto.getPostImg()
+        );
+    }
+
 }

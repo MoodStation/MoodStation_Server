@@ -20,4 +20,10 @@ public class PostImg {
     private String filePath;
 
     private String fileFullPath;
+
+    public void changeBookImg(String imgName, String filePath, String fileFullPath) {
+        this.imgName = imgName;
+        this.filePath = filePath;
+        this.fileFullPath = fileFullPath;
+    }
 }

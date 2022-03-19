@@ -18,4 +18,5 @@ public class PostImgDto {
         this.filePath = filePath;
         this.fileFullPath = fileFullPath;
     }
+
 }
