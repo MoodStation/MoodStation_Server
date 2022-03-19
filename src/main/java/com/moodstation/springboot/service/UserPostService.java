@@ -2,6 +2,7 @@ package com.moodstation.springboot.service;
 
 import com.moodstation.springboot.dto.PostImgDto;
 import com.moodstation.springboot.dto.UserPostDto;
+import com.moodstation.springboot.dto.UserPostResponseDto;
 import com.moodstation.springboot.entity.Keyword;
 import com.moodstation.springboot.entity.PostImg;
 import com.moodstation.springboot.entity.User;
@@ -15,7 +16,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -64,10 +67,16 @@ public class UserPostService {
     }
 
 
-    public List<Keyword> getKeywords(Long uid){
-        User findUser = userRepository.findById(uid).get();
+    public List<String> getKeywords(Long pid){
+        UserPost userPost = userPostRepository.findById(pid).get();
+        List<Keyword> keywords = keywordRepository.findByUserPost(userPost);
 
-        return keywordRepository.findByUser(findUser);
+        List<String> result = new ArrayList<>();
+        for (Keyword keyword : keywords) {
+            result.add(keyword.getContent());
+        }
+
+        return result;
     }
 
     public List<UserPost> getUserPosts(Long uid){
@@ -76,8 +85,17 @@ public class UserPostService {
         return userPostRepository.findByUser(findUser);
     }
 
-    public UserPost getUserPostDetail(Long pid){
-        return userPostRepository.findById(pid).get();
+    public UserPostResponseDto getUserPostDetail(Long pid){
+        UserPost userPost = userPostRepository.findById(pid).get();
+        UserPostResponseDto userPostResponseDto = UserPostResponseDto.builder()
+                .postId(userPost.getId())
+                .postImg(userPost.getPostImg())
+                .color(userPost.getColor())
+                .regDate(userPost.getRegDate())
+                .keywords(getKeywords(pid))
+                .build();
+
+        return userPostResponseDto;
     }
 
     public void removeUserPost(Long pid){

@@ -2,6 +2,7 @@ package com.moodstation.springboot.controller;
 
 import com.moodstation.springboot.dto.PostImgDto;
 import com.moodstation.springboot.dto.UserPostDto;
+import com.moodstation.springboot.dto.UserPostResponseDto;
 import com.moodstation.springboot.entity.Keyword;
 import com.moodstation.springboot.entity.UserPost;
 import com.moodstation.springboot.service.PostImgService;
@@ -50,18 +51,18 @@ public class UserPostController {
 
     @GetMapping()
     public ResponseEntity<Map<String,Object>> getPostList(){
-        List<Keyword> keywords = userPostService.getKeywords(userId);
-        List<UserPost> userPosts = userPostService.getUserPosts(userId);
-        Map<String, Object> result = new HashMap<>();
-        result.put("keywords", keywords);
-        result.put("userPosts", userPosts);
+        List<UserPost> postList = userPostService.getUserPosts(userId);
 
-        return new ResponseEntity(result, HttpStatus.OK);
+        return new ResponseEntity(postList, HttpStatus.OK);
     }
   
     @GetMapping("/{pid}")
-    public ResponseEntity getPostDetail(@PathVariable Long pid){
-        UserPost findPost = userPostService.getUserPostDetail(pid);
+    public ResponseEntity getPostDetail(
+            @RequestHeader String accessToken,
+            @PathVariable Long pid){
+        if(accessToken==null) return new ResponseEntity(HttpStatus.FORBIDDEN);
+
+        UserPostResponseDto findPost = userPostService.getUserPostDetail(pid);
 
         return new ResponseEntity(findPost, HttpStatus.OK);
     }
