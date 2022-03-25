@@ -1,4 +1,4 @@
-package com.moodstation.springboot.web;
+package com.moodstation.springboot.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
