@@ -1,29 +1,29 @@
-package com.moodstation.springboot.dto;
+package com.moodstation.springboot.dto.request;
 
 import com.moodstation.springboot.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
+@Builder
 @NoArgsConstructor
-public class UserSignupRequestDto {
+public class LoginDto {
 
     private String email;
-    private String nickname;
     private String password;
 
     @Builder
-    public UserSignupRequestDto(String email, String nickname, String password) {
+    public LoginDto(String email, String password) {
         this.email = email;
-        this.nickname = nickname;
         this.password = password;
     }
 
     public User toEntity() {
         return User.builder()
                 .email(email)
-                .nickname(nickname)
                 .password(password)
                 .build();
     }
