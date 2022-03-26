@@ -1,21 +1,25 @@
 package com.moodstation.springboot.controller;
 
-import com.moodstation.springboot.dto.PostImgDto;
-import com.moodstation.springboot.dto.UserPostDto;
-import com.moodstation.springboot.dto.UserPostListResponseDto;
-import com.moodstation.springboot.dto.UserPostResponseDto;
+import com.moodstation.springboot.dto.*;
+import com.moodstation.springboot.entity.UserPost;
 import com.moodstation.springboot.service.PostImgService;
 import com.moodstation.springboot.service.S3Service;
 import com.moodstation.springboot.service.UserPostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/emotion")
@@ -49,13 +53,17 @@ public class UserPostController {
 
     @GetMapping()
     public ResponseEntity<Map<String,Object>> getPostList(
-            @RequestHeader String accessToken
-    ){
+            @PathVariable Optional<Integer> page,
+            UserPostSearchDto userPostSearchDto,
+            @RequestHeader String accessToken) {
         if(accessToken==null) return new ResponseEntity(HttpStatus.FORBIDDEN);
 
-        List<UserPostListResponseDto> postList = userPostService.getUserPosts(accessToken);
+        int size = userPostSearchDto.getSearchDate().lengthOfMonth();
+        Pageable pageable = PageRequest.of(page.isPresent() ? page.get() : 0, size);
 
-        return new ResponseEntity(postList, HttpStatus.OK);
+        Map<String, Object> result = userPostService.getUserPosts(accessToken, userPostSearchDto, pageable);
+
+        return new ResponseEntity(result, HttpStatus.OK);
     }
   
     @GetMapping("/{pid}")
