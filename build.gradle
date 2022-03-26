@@ -36,6 +36,15 @@ dependencies {
     implementation 'org.modelmapper:modelmapper:2.4.5'
     implementation 'io.springfox:springfox-boot-starter:3.0.0'
     implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+
+    //querydsl
+    implementation 'com.querydsl:querydsl-jpa'
+    //쿼리타입(Q)를 생성할 때 필요
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    //querydsl 추가 끝
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     runtimeOnly 'mysql:mysql-connector-java'

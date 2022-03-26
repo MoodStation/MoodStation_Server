@@ -1,24 +1,22 @@
 package com.moodstation.springboot.service;
 
-import com.moodstation.springboot.dto.PostImgDto;
-import com.moodstation.springboot.dto.UserPostDto;
-import com.moodstation.springboot.dto.UserPostListResponseDto;
-import com.moodstation.springboot.dto.UserPostResponseDto;
+import com.moodstation.springboot.dto.*;
 import com.moodstation.springboot.entity.Keyword;
 import com.moodstation.springboot.entity.PostImg;
 import com.moodstation.springboot.entity.User;
 import com.moodstation.springboot.entity.UserPost;
-import com.moodstation.springboot.repository.KeywordRepository;
-import com.moodstation.springboot.repository.PostImgRepository;
-import com.moodstation.springboot.repository.UserPostRepository;
-import com.moodstation.springboot.repository.UserRepository;
+import com.moodstation.springboot.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -59,7 +57,7 @@ public class UserPostService {
                     .userPost(UserPost.builder().id(postId).build())
                     .content(word)
                     .user(user)
-                    .isShare("T")
+                    .isShare("F")
                     .build();
 
             keywordRepository.save(keyword);
@@ -79,23 +77,35 @@ public class UserPostService {
         return result;
     }
 
-    public List<UserPostListResponseDto> getUserPosts(String accessToken){
-        List<UserPost> posts
-                = userPostRepository.findByUser(userRepository.findByAccessToken(accessToken));
+    public Map<String,Object> getUserPosts(String accessToken, UserPostSearchDto userPostSearchDto, Pageable pageable){
+        Page<UserPost> posts = userPostRepository.userPostSearchPage(accessToken, userPostSearchDto, pageable);
 
-        List<UserPostListResponseDto> result = new ArrayList<>();
-        for (UserPost post : posts) {
+        List<UserPostListResponseDto> postList = new ArrayList<>();
+        for (UserPost post : posts.getContent()) {
             UserPostListResponseDto userPost = UserPostListResponseDto.builder()
                     .postId(post.getId())
                     .postImg(post.getPostImg())
                     .regDate(post.getRegDate())
+                    .color(post.getColor())
                     .content(post.getContent())
                     .keywords(getKeywords(post.getId()))
                     .build();
-            result.add(userPost);
+            postList.add(userPost);
         }
+
+        UserPostListPageInfoDto pageInfo = UserPostListPageInfoDto
+                .builder()
+                .pageSize(posts.getSize())
+                .totalElements(posts.getTotalElements())
+                .build();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("postList", postList);
+        result.put("pageInfo", pageInfo);
+
         return result;
     }
+
 
     public UserPostResponseDto getUserPostDetail(Long pid){
         UserPost userPost = userPostRepository.findById(pid).get();
