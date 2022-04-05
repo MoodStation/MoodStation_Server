@@ -6,7 +6,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,21 +16,22 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
 
 @Component
+@RequiredArgsConstructor
 public class JwtGenerator {
 
     public static final long JWT_ACCESS_TOKEN_VALIDITY = 60 * 60 * 24 * 365 * 10; //10년
     public static final long JWT_REFRESH_TOKEN_VALIDITY = 24 * 60 * 60 * 180; //6개월
+    private final JwtUserDetailsService jwtUserDetailsService;
+    private final UserRepository userRepository;
+//    @Autowired
+//    private JwtUserDetailsService jwtUserDetailsService;
 
-    @Autowired
-    private JwtUserDetailsService jwtUserDetailsService;
-
-    @Autowired
-    private UserRepository userRepository;
+//    @Autowired
+//    private UserRepository userRepository;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -93,7 +94,7 @@ public class JwtGenerator {
         Claims parseInfo = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
         Map<String, Object> result = new HashMap<>();
         result.put("userId", parseInfo.getSubject());
-        result.put("role", parseInfo.get("role", List.class));
+        result.put("role", parseInfo.get("role", String.class));
         return result;
     }
 

@@ -28,27 +28,27 @@ public class UserPostController {
     private final UserPostService userPostService;
     private final PostImgService postImgService;
     private final S3Service s3Service;
-    private static final Long userId=1L;
 
 
     @PostMapping()
     public ResponseEntity addPost(
             MultipartFile file,
             PostImgDto postImgDto,
-            @ModelAttribute UserPostDto userPostDto
+            @ModelAttribute UserPostDto userPostDto,
+            @RequestHeader String accessToken
             ) throws IOException {
+        if(accessToken==null) return new ResponseEntity(HttpStatus.FORBIDDEN);
 
-        Long postNo;
         if (file != null) {
             postImgDto.setImgName(file.getName());
             postImgDto.setFilePath(s3Service.upload(postImgDto.getFilePath(), file));
 
-            postNo = userPostService.addPostWithPhoto(userId, userPostDto, postImgDto);
+            userPostService.addPostWithPhoto(accessToken, userPostDto, postImgDto);
         } else {
-            postNo = userPostService.addPost(userId,userPostDto);
+            userPostService.addPost(accessToken,userPostDto);
         }
 
-        return new ResponseEntity<>(postNo, HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping()

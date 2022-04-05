@@ -23,8 +23,9 @@ public class UserPostSearchRepositoryImpl implements UserPostSearchRepository {
     public Page<UserPost> userPostSearchPage(String accessToken, UserPostSearchDto userPostSearchDto, Pageable pageable) {
 
         List<UserPost> content = jpaQueryFactory.selectFrom(QUserPost.userPost)
-                .where(searchByYearMonth(userPostSearchDto),
-                        searchUser(accessToken))
+                .where(searchByYearMonth(userPostSearchDto)
+                //        searchUser(accessToken)
+                )
                 .orderBy(QUserPost.userPost.id.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -41,8 +42,8 @@ public class UserPostSearchRepositoryImpl implements UserPostSearchRepository {
         return QUserPost.userPost.regDate.yearMonth().like(userPostSearchDto.getSearchDate().format(DateTimeFormatter.ofPattern("yyyyMM")));
     }
 
-    private BooleanExpression searchUser(String accessToken) {
-        return QUserPost.userPost.user.accessToken.like(accessToken);
-    }
+//    private BooleanExpression searchUser(String accessToken) {
+//        return QUserPost.userPost.user.accessToken.like(accessToken);
+//    }
 
 }
