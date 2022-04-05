@@ -5,6 +5,7 @@ import com.moodstation.springboot.entity.Keyword;
 import com.moodstation.springboot.entity.PostImg;
 import com.moodstation.springboot.entity.User;
 import com.moodstation.springboot.entity.UserPost;
+import com.moodstation.springboot.jwt.JwtGenerator;
 import com.moodstation.springboot.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -29,29 +30,37 @@ public class UserPostService {
     private final ModelMapper modelMapper;
     private final S3Service s3Service;
     private final PostImgService postImgService;
+    private final JwtGenerator jwtGenerator;
 
-    public Long addPostWithPhoto(Long userId,UserPostDto userPostDto, PostImgDto postImgDto) {
+    public Long addPostWithPhoto(String accessToken, UserPostDto userPostDto, PostImgDto postImgDto) {
+
+        Map<String, Object> userParseInfo = jwtGenerator.getUserParseInfo(accessToken);
+
+        String userEmail = userParseInfo.get("userId").toString();
         postImgDto.setFileFullPath("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/" + postImgDto.getFilePath());
 
         userPostDto.setPostImg(modelMapper.map(postImgDto,PostImg.class));
 
-        User findUser = userRepository.findById(userId).get();
+        User findUser = userRepository.findUserByEmail(userEmail);
         userPostDto.setUser(findUser);
         Long savedPostId = userPostRepository.save(modelMapper.map(userPostDto, UserPost.class)).getId();
-        addKeywords(savedPostId, userId, userPostDto.getKeywords());
+        addKeywords(savedPostId, userEmail, userPostDto.getKeywords());
         return savedPostId;
     }
 
-    public Long addPost(Long userId,UserPostDto userPostDto) {
-        User findUser = userRepository.findById(userId).get();
+    public Long addPost(String accessToken,UserPostDto userPostDto) {
+        Map<String, Object> userParseInfo = jwtGenerator.getUserParseInfo(accessToken);
+        String userEmail = userParseInfo.get("userId").toString();
+
+        User findUser = userRepository.findUserByEmail(userEmail);
         userPostDto.setUser(findUser);
         Long savedPostId = userPostRepository.save(modelMapper.map(userPostDto, UserPost.class)).getId();
-        addKeywords(savedPostId,userId, userPostDto.getKeywords());
+        addKeywords(savedPostId,userEmail, userPostDto.getKeywords());
         return savedPostId;
     }
 
-    public void addKeywords(Long postId, Long userId, List<String> keywordList) {
-        User user = userRepository.findById(userId).get();
+    public void addKeywords(Long postId, String userEmail, List<String> keywordList) {
+        User user = userRepository.findUserByEmail(userEmail);
         for (String word : keywordList) {
             Keyword keyword = Keyword.builder()
                     .userPost(UserPost.builder().id(postId).build())
@@ -136,7 +145,7 @@ public class UserPostService {
 
         //기존 키워드 삭제
         keywordRepository.deleteByUserPost(findUserPost);
-        addKeywords(pid,userPostDto.getUser().getId(),userPostDto.getKeywords());
+        //addKeywords(pid,userPostDto.getUser().getId(),userPostDto.getKeywords());
 
         findUserPost.changeUserPost(
                 userPostDto.getRegDate(),
@@ -157,7 +166,7 @@ public class UserPostService {
 
         //기존 키워드 삭제
         keywordRepository.deleteByUserPost(findUserPost);
-        addKeywords(pid,userPostDto.getUser().getId(),userPostDto.getKeywords());
+        //addKeywords(pid,userPostDto.getUser().getId(),userPostDto.getKeywords());
 
         findUserPost.changeUserPost(
                 userPostDto.getRegDate(),
