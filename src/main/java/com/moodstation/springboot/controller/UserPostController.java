@@ -65,7 +65,7 @@ public class UserPostController {
 
         return new ResponseEntity(result, HttpStatus.OK);
     }
-  
+
     @GetMapping("/{pid}")
     public ResponseEntity getPostDetail(
             @RequestHeader String accessToken,
@@ -89,19 +89,20 @@ public class UserPostController {
     }
 
     @PutMapping("/{pid}")
-    public ResponseEntity updatePostDetail(@PathVariable Long pid,
+    public ResponseEntity updatePostDetail(@RequestHeader String accessToken,
+                                           @PathVariable Long pid,
                                            MultipartFile file,
                                            PostImgDto postImgDto,
                                            @ModelAttribute UserPostDto userPostDto) throws IOException {
+        if(accessToken==null) return new ResponseEntity(HttpStatus.FORBIDDEN);
 
         if (file != null) {
             postImgDto.setImgName(file.getName());
             postImgDto.setFilePath(s3Service.upload(postImgDto.getFilePath(), file));
             postImgService.updatePostImg(pid, postImgDto);
-            userPostService.updateUserPostWithPhoto(userPostDto, postImgDto, pid);
+            userPostService.updateUserPostWithPhoto(accessToken, userPostDto, postImgDto, pid);
         } else {
-            //postImgService.deletePostImg(pid);
-            userPostService.updateUserPost(userPostDto, pid);
+            userPostService.updateUserPost(accessToken, userPostDto, pid);
         }
 
         return new ResponseEntity(HttpStatus.OK);
