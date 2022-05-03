@@ -34,14 +34,12 @@ public class UserPostService {
 
     public Long addPostWithPhoto(String accessToken, UserPostDto userPostDto, PostImgDto postImgDto) {
 
-        Map<String, Object> userParseInfo = jwtGenerator.getUserParseInfo(accessToken);
-
-        String userEmail = userParseInfo.get("userId").toString();
         postImgDto.setFileFullPath("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/" + postImgDto.getFilePath());
 
+        String userEmail = getUserEmail(accessToken);
         userPostDto.setPostImg(modelMapper.map(postImgDto,PostImg.class));
-
         User findUser = userRepository.findUserByEmail(userEmail);
+
         userPostDto.setUser(findUser);
         Long savedPostId = userPostRepository.save(modelMapper.map(userPostDto, UserPost.class)).getId();
         addKeywords(savedPostId, userEmail, userPostDto.getKeywords());
@@ -49,10 +47,9 @@ public class UserPostService {
     }
 
     public Long addPost(String accessToken,UserPostDto userPostDto) {
-        Map<String, Object> userParseInfo = jwtGenerator.getUserParseInfo(accessToken);
-        String userEmail = userParseInfo.get("userId").toString();
-
+        String userEmail = getUserEmail(accessToken);
         User findUser = userRepository.findUserByEmail(userEmail);
+
         userPostDto.setUser(findUser);
         Long savedPostId = userPostRepository.save(modelMapper.map(userPostDto, UserPost.class)).getId();
         addKeywords(savedPostId,userEmail, userPostDto.getKeywords());
@@ -136,7 +133,7 @@ public class UserPostService {
         userPostRepository.deleteById(pid);
     }
 
-    public void updateUserPostWithPhoto(UserPostDto userPostDto, PostImgDto postImgDto, Long pid){
+    public void updateUserPostWithPhoto(String accessToken, UserPostDto userPostDto, PostImgDto postImgDto, Long pid){
         postImgDto.setFileFullPath("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/" + postImgDto.getFilePath());
         userPostDto.setPostImg(modelMapper.map(postImgDto,PostImg.class));
         UserPost findUserPost = userPostRepository.findById(pid).get();
@@ -145,7 +142,9 @@ public class UserPostService {
 
         //기존 키워드 삭제
         keywordRepository.deleteByUserPost(findUserPost);
-        //addKeywords(pid,userPostDto.getUser().getId(),userPostDto.getKeywords());
+
+        String userEmail = getUserEmail(accessToken);
+        addKeywords(pid,userEmail,userPostDto.getKeywords());
 
         findUserPost.changeUserPost(
                 userPostDto.getRegDate(),
@@ -156,17 +155,17 @@ public class UserPostService {
     }
 
 
-    public void updateUserPost(UserPostDto userPostDto, Long pid) {
+    public void updateUserPost(String accessToken, UserPostDto userPostDto, Long pid) {
         UserPost findUserPost = userPostRepository.findById(pid).get();
 
-        if (findUserPost.getPostImg().getId()!=null) {
+        if (findUserPost.getPostImg()!=null) {
             postImgService.deletePostImg(pid);
             s3Service.delete(findUserPost.getPostImg().getFilePath());
         }
 
         //기존 키워드 삭제
         keywordRepository.deleteByUserPost(findUserPost);
-        //addKeywords(pid,userPostDto.getUser().getId(),userPostDto.getKeywords());
+        addKeywords(pid,accessToken,userPostDto.getKeywords());
 
         findUserPost.changeUserPost(
                 userPostDto.getRegDate(),
@@ -176,4 +175,8 @@ public class UserPostService {
         );
     }
 
+    public String getUserEmail(String accessToken){
+        Map<String, Object> userParseInfo = jwtGenerator.getUserParseInfo(accessToken);
+        return userParseInfo.get("userId").toString();
+    }
 }
