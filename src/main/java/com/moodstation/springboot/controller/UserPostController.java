@@ -1,23 +1,20 @@
 package com.moodstation.springboot.controller;
 
 import com.moodstation.springboot.dto.*;
-import com.moodstation.springboot.entity.UserPost;
+import com.moodstation.springboot.jwt.JwtGenerator;
 import com.moodstation.springboot.service.PostImgService;
 import com.moodstation.springboot.service.S3Service;
 import com.moodstation.springboot.service.UserPostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -28,6 +25,7 @@ public class UserPostController {
     private final UserPostService userPostService;
     private final PostImgService postImgService;
     private final S3Service s3Service;
+    private final JwtGenerator jwtGenerator;
 
 
     @PostMapping()
@@ -35,8 +33,9 @@ public class UserPostController {
             MultipartFile file,
             PostImgDto postImgDto,
             @ModelAttribute UserPostDto userPostDto,
-            @RequestHeader String accessToken
+            HttpServletRequest request
             ) throws IOException {
+        String accessToken = jwtGenerator.resolveToken(request);
         if(accessToken==null) return new ResponseEntity(HttpStatus.FORBIDDEN);
 
         if (file != null) {
@@ -55,7 +54,8 @@ public class UserPostController {
     public ResponseEntity<Map<String,Object>> getPostList(
             @PathVariable Optional<Integer> page,
             UserPostSearchDto userPostSearchDto,
-            @RequestHeader String accessToken) {
+            HttpServletRequest request) {
+        String accessToken = jwtGenerator.resolveToken(request);
         if(accessToken==null) return new ResponseEntity(HttpStatus.FORBIDDEN);
 
         int size = userPostSearchDto.getSearchDate().lengthOfMonth();
@@ -68,8 +68,9 @@ public class UserPostController {
 
     @GetMapping("/{pid}")
     public ResponseEntity getPostDetail(
-            @RequestHeader String accessToken,
+            HttpServletRequest request,
             @PathVariable Long pid){
+        String accessToken = jwtGenerator.resolveToken(request);
         if(accessToken==null) return new ResponseEntity(HttpStatus.FORBIDDEN);
 
         UserPostResponseDto findPost = userPostService.getUserPostDetail(pid);
@@ -79,8 +80,9 @@ public class UserPostController {
 
     @DeleteMapping("/{pid}")
     public ResponseEntity removePostDetail(
-            @RequestHeader String accessToken,
+            HttpServletRequest request,
             @PathVariable Long pid){
+        String accessToken = jwtGenerator.resolveToken(request);
         if(accessToken==null) return new ResponseEntity(HttpStatus.FORBIDDEN);
 
         userPostService.removeUserPost(pid);
@@ -89,11 +91,13 @@ public class UserPostController {
     }
 
     @PutMapping("/{pid}")
-    public ResponseEntity updatePostDetail(@RequestHeader String accessToken,
+    public ResponseEntity updatePostDetail(
+                                           HttpServletRequest request,
                                            @PathVariable Long pid,
                                            MultipartFile file,
                                            PostImgDto postImgDto,
                                            @ModelAttribute UserPostDto userPostDto) throws IOException {
+        String accessToken = jwtGenerator.resolveToken(request);
         if(accessToken==null) return new ResponseEntity(HttpStatus.FORBIDDEN);
 
         if (file != null) {
